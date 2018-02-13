@@ -39,7 +39,7 @@ precision = .0001
 def mleq(mle, d = data):
     s = 0
     for datum in d:
-        s = s + 3*datum/(1+datum*mle)
+        s = s + 3*datum/(mle*mle+datum*mle)
     return s - len(d)/mle
     
 # Finds solution to mleq(i) == 0 iteratively with forward precision of "precision"
