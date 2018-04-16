@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html>
+<head><title>Canvas code example</title>
+<script type="text/javascript" src="./jsstats.js"></script>
+<script type="text/javascript" src="./redraw.js"></script>
+<script type="text/javascript">
+
+// Get some normal functions
+var norm = new jsstats.NormalDistribution(0,1);
+
+var slide_mu_0 = document.getElementById("mu_0");
+var mu_0 = slide_mu_0;
+var alpha = 0.05;
+var n = 33;
+var variance = 0.75;
+
+function fun2(mu) {return norm.cumulativeProbability(norm.invCumulativeProbability(alpha)+(mu_0-mu)*Math.sqrt(n)/variance);}
+
+function draw() {
+ var canvas = document.getElementById("canvas");
+ if (null==canvas || !canvas.getContext) return;
+
+ var axes={}, ctx=canvas.getContext("2d");
+ axes.x0 = .5 + .5*canvas.width;  // x0 pixels from left to x=0
+ axes.y0 = .5 + .5*canvas.height; // y0 pixels from top to y=0
+ axes.scale = 40;                 // 40 pixels from x=0 to x=1
+ axes.doNegativeX = true;
+
+ showAxes(ctx,axes);
+ funGraph(ctx,axes,fun2,"rgb(66,44,255)",2);
+}
+
+function funGraph (ctx,axes,func,color,thick) {
+ var xx, yy, dx=4, x0=axes.x0, y0=axes.y0, scale=axes.scale;
+ var iMax = Math.round((ctx.canvas.width-x0)/dx);
+ var iMin = axes.doNegativeX ? Math.round(-x0/dx) : 0;
+ ctx.beginPath();
+ ctx.lineWidth = thick;
+ ctx.strokeStyle = color;
+
+ for (var i=iMin;i<=iMax;i++) {
+  xx = dx*i; yy = scale*func(xx/scale);
+  if (i==iMin) ctx.moveTo(x0+xx,y0-yy);
+  else         ctx.lineTo(x0+xx,y0-yy);
+ }
+ ctx.stroke();
+}
+
+function showAxes(ctx,axes) {
+ var x0=axes.x0, w=ctx.canvas.width;
+ var y0=axes.y0, h=ctx.canvas.height;
+ var xmin = axes.doNegativeX ? 0 : x0;
+ ctx.beginPath();
+ ctx.strokeStyle = "rgb(128,128,128)"; 
+ ctx.moveTo(xmin,y0); ctx.lineTo(w,y0);  // X axis
+ ctx.moveTo(x0,0);    ctx.lineTo(x0,h);  // Y axis
+ ctx.stroke();
+}
+
+/*slide_mu_0.oninput = function() {
+	mu_0 = slide_mu_0;
+	fun2 = function fun2(mu) {return norm.cumulativeProbability(norm.invCumulativeProbability(alpha)+(mu_0-mu)*Math.sqrt(n)/variance);}
+	draw();
+	document.write("HELLOW");
+}*/
+</script>
+</head>
+<body onload="draw()">
+<h1>pi(mu)</h1>
+<canvas id="canvas" width="502" height="108"></canvas>
+
+<h2> Change mu_0 </h2>
+<div class="slidecontainer">
+  <input type="range" min="-10" max="10" value="3" class="slider" id="mu_0">
+  <p>Value: <span id="demo"></span></p>
+</div>
+<h2> Change alpha </h2>
+<div class="slidecontainer">
+  <input type="range" min="0.05" max="0.995" value="0.05" class="slider" id="alpha" step="0.005">
+  <p>Value: <span id="demo_alpha"></span></p>
+</div>
+<h2> Change n </h2>
+<div class="slidecontainer">
+  <input type="range" min="1" max="200" value="33" class="slider" id="n">
+  <p>Value: <span id="demo_n"></span></p>
+</div>
+
+<script>
+var slider_mu_0 = document.getElementById("mu_0");
+var slider_alpha = document.getElementById("alpha");
+var slider_n = document.getElementById("n");
+var output = document.getElementById("demo");
+var outputalpha = document.getElementById("demo_alpha");
+var outputn = document.getElementById("demo_n");
+output.innerHTML = slider_mu_0.value;
+outputalpha.innerHTML = slider_alpha.value;
+outputn.innerHTML = slider_n.value;
+slider_mu_0.oninput = function() {
+  output.innerHTML = this.value;
+  
+  var norm = new jsstats.NormalDistribution(0,1);
+
+
+  var mu_0 = this.value;
+  var alpha = slider_alpha.value;
+  var n = slider_n.value;
+  var variance = 0.75;
+
+  function fun2(mu) {return norm.cumulativeProbability(norm.invCumulativeProbability(alpha)+(mu_0-mu)*Math.sqrt(n)/variance);}
+  redraw(fun2);
+}
+slider_alpha.oninput = function() {
+  outputalpha.innerHTML = this.value;
+  
+  var norm = new jsstats.NormalDistribution(0,1);
+
+
+  var mu_0 = slider_mu_0.value;
+  var alpha = this.value;
+  var n = slider_n.value;
+  var variance = 0.75;
+
+  function fun2(mu) {return norm.cumulativeProbability(norm.invCumulativeProbability(alpha)+(mu_0-mu)*Math.sqrt(n)/variance);}
+  redraw(fun2);
+}
+slider_n.oninput = function() {
+  outputn.innerHTML = this.value;
+  
+  var norm = new jsstats.NormalDistribution(0,1);
+
+
+  var mu_0 = slider_mu_0.value;
+  var alpha = slider_alpha.value;
+  var n = this.value;
+  var variance = 0.75;
+
+  function fun2(mu) {return norm.cumulativeProbability(norm.invCumulativeProbability(alpha)+(mu_0-mu)*Math.sqrt(n)/variance);}
+  redraw(fun2);
+}
+
+
+
+</script>
+</body>
+</html>
